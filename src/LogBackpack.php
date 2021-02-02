@@ -6,7 +6,7 @@ use Mk2\Libraries\Backpack;
 
 class LogBackpack extends Backpack{
 
-    public $directory=MK2_PATH_TEMPORARY;
+    public $temporary=MK2_PATH_TEMPORARY;
 
     public $path="log";
     public $fileName="{Y}{m}{d}.log";
@@ -16,28 +16,49 @@ class LogBackpack extends Backpack{
     /**
      * out
      * @param string $text
+     * @param $option = null
      */
-    public function out($message){
-        $this->_out($message);
+    public function out($message,$option=null){
+        $this->_out($message,$option);
+        return $this;
     }
 
-    private function _out($message){
+    private function _out($message,$option){
 
-        $filePath=$this->directory."/".$this->path;
+        $temporary=$this->temporary;
+        if(!empty($option["temporary"])){
+            $temporary=$option["temporary"];
+        }
+
+        $path=$this->path;
+        if(!empty($option["path"])){
+            $path=$option["path"];
+        }
+
+        $filePath=$temporary."/".$path;
 
         if(!is_dir($filePath)){
             mkdir($filePath,0777,true);
         }
 
-        $fileName=$this->_convertFileName();
+        $fileName=$this->fileName;
+        if(!empty($option["fileName"])){
+            $fileName=$option["fileName"];
+        }
+
+        $fileName=$this->_convertFileName($fileName);
         
-        error_log($this->_convert($message),3,$filePath."/".$fileName);
+        $header=$this->header;
+        if(!empty($option["header"])){
+            $header=$option["header"];
+        }
+
+        error_log($this->_convert($message,$header),3,$filePath."/".$fileName);
 
     }
 
-    private function _convertFileName(){
+    private function _convertFileName($fileName){
 
-        $fileName=$this->fileName;
         $fileName=str_replace("{Y}",date("Y"),$fileName);
         $fileName=str_replace("{m}",date("m"),$fileName);
         $fileName=str_replace("{d}",date("d"),$fileName);
@@ -48,9 +69,7 @@ class LogBackpack extends Backpack{
         return $fileName;
     }
 
-    private function _convert($message){
-
-        $headers=$this->header;
+    private function _convert($message,$headers){
         
         $headers=str_replace("{datetime}",date_format(date_create("now"),"Y/m/d H:i:s"),$headers);
         $headers=str_replace("{request.method}",$this->Request->params("method"),$headers);
