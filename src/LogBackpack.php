@@ -10,17 +10,28 @@ class LogBackpack extends Backpack{
 
     public $path="log";
     public $fileName="{Y}{m}{d}.log";
+    public $errorFileName="error-{Y}{m}{d}.log";
 
     public $header="{datetime} {request.method} {request.root} {response.code} {request.query} {request.remoteip} {response.message}";
 
     /**
      * out
-     * @param string $text
+     * @param string $message
      * @param $option = null
      */
     public function out($message,$option=null){
         $this->_out($message,$option);
         return $this;
+    }
+
+    /**
+     * error
+     * @param string $exception
+     * @param $option = null
+     */
+    public function error($exception,$option=null){
+        $option["fileName"]=$this->errorFileName;
+        return $this->out($exception,$option);
     }
 
     private function _out($message,$option){
