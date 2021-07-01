@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * ===================================================
+ * 
+ * PHP Framework "Mk2"
+ *
+ * LogBackpack
+ * 
+ * Backpack class base file.
+ * 
+ * URL : https://www.mk2-php.com/
+ * 
+ * Copylight : Nakajima-Satoru 2021.
+ *           : Sakaguchiya Co. Ltd. (https://www.teastalk.jp/)
+ * 
+ * ===================================================
+ */
+
 namespace mk2\backpack_log;
 
 use Mk2\Libraries\Backpack;
@@ -19,7 +36,7 @@ class LogBackpack extends Backpack{
      * @param string $message
      * @param $option = null
      */
-    public function out($message,$option=null){
+    public function out($message, $option=null){
         $this->_out($message,$option);
         return $this;
     }
@@ -29,24 +46,29 @@ class LogBackpack extends Backpack{
      * @param string $exception
      * @param $option = null
      */
-    public function error($exception,$option=null){
-        $option["fileName"]=$this->errorFileName;
+    public function error($exception, $option = null){
+        $option["fileName"] = $this->errorFileName;
         return $this->out($exception,$option);
     }
 
-    private function _out($message,$option){
+    /**
+     * _out
+     * @param $message
+     * @param $option
+     */
+    private function _out($message, $option){
 
         $temporary=$this->temporary;
         if(!empty($option["temporary"])){
-            $temporary=$option["temporary"];
+            $temporary = $option["temporary"];
         }
 
         $path=$this->path;
         if(!empty($option["path"])){
-            $path=$option["path"];
+            $path = $option["path"];
         }
 
-        $filePath=$temporary."/".$path;
+        $filePath = $temporary."/".$path;
 
         if(!is_dir($filePath)){
             mkdir($filePath,0777,true);
@@ -68,6 +90,10 @@ class LogBackpack extends Backpack{
 
     }
 
+    /**
+     * _convertFileName
+     * @param $fileName
+     */
     private function _convertFileName($fileName){
 
         $fileName=str_replace("{Y}",date("Y"),$fileName);
@@ -80,6 +106,11 @@ class LogBackpack extends Backpack{
         return $fileName;
     }
 
+    /**
+     * _convert
+     * @param $message
+     * @param $headers
+     */
     private function _convert($message,$headers){
         
         $headers=str_replace("{datetime}",date_format(date_create("now"),"Y/m/d H:i:s"),$headers);
